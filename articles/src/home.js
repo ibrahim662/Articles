@@ -1,11 +1,6 @@
-import React, { useState, useEffect, useParams } from "react";
-import { Text, View, TouchableOpacity, StyleSheet, Button } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-
 const styles = StyleSheet.create({
   artc: {
-    alignItems: "flex-start",
-    top: 50,
+    flex: 1,
     marginTop: 16,
     paddingVertical: 8,
     borderWidth: 4,
@@ -17,16 +12,47 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
   },
+
   title: {
     fontSize: 25,
   },
-  button: {
+
+  btnText: {
+    color: "white",
+    fontSize: 15,
+    textAlign: "center",
+  },
+  btnD: {
+    backgroundColor: "black",
+    padding: 5,
+    borderRadius: 4,
+    flexDirection: "row",
+    left: 300,
     alignItems: "center",
-    backgroundColor: "#DDDDDD",
-    padding: 10,
-    marginBottom: 10,
+  },
+  bTXT: {
+    color: "yellow",
+  },
+  tit: {
+    color: "black",
+    fontSize: 15,
+    padding: 5,
+    textAlign: "center",
+    fontWeight: "bold",
   },
 });
+
+import React, { useState, useEffect } from "react";
+import {
+  FlatList,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const Articles = () => {
   const [articles, setArticles] = useState([]);
@@ -36,6 +62,7 @@ const Articles = () => {
     const requestOptions = {
       method: "GET",
       redirect: "follow",
+
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -47,25 +74,36 @@ const Articles = () => {
       .then((result) => setArticles(result))
       .catch((error) => console.error(error));
   }, []);
-  console.log(articles);
-  return articles.map((article) => {
+
+  const render = ({ item }) => {
     return (
-      <View key={article.title}>
-        <View style={styles.artc}>
-          <Text>{article.title}</Text>
-          {/* <Button
-                        title='Voir plus'
-                        onPress={() => history.push({"/articles/":{id}})}
-                    ></Button> */}
+      <View style={styles.artc}>
+        <ScrollView style={{ flex: 1 }}>
+          <Text style={styles.tit}>{item.title}</Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Details", { id: article.id })}
+            style={styles.btnD}
+            onPress={() => navigation.navigate("Details", { id: item.id })}
           >
-            <Text>Voir PLus</Text>
+            <Text style={styles.bTXT}>VOIR PLUS</Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </View>
     );
-  });
+  };
+
+  return (
+    <SafeAreaView
+      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+    >
+      {/* <Text style={{fontSize:18,fontWeight:'bold'}}>React Native FlatList Load More On Scroll</Text> 
+  <Text style={{fontSize:16,fontWeight:'bold'}}>Programming with savio</Text> */}
+      <FlatList
+        data={articles}
+        renderItem={render}
+        keyExtractor={(item, i) => i.toString()}
+      />
+    </SafeAreaView>
+  );
 };
 
 export default Articles;

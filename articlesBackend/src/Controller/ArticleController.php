@@ -25,8 +25,8 @@ class ArticleController extends AbstractController
     {
         
         $posts = $this->getDoctrine()
-            ->getRepository(Article::class)
-            ->findAll();
+        ->getRepository(Article::class)
+        ->findAll();
 
         $json = $serializer->serialize($posts, 'json');
 
@@ -89,32 +89,49 @@ class ArticleController extends AbstractController
      */
     public function edit(Request $request, Article $article): Response
     {
+        // $form = $this->createForm(ArticleType::class, $article);
+        // $form->handleRequest($request);
+
+        //     $this->getDoctrine()->getManager()->flush();
+
+        //     // return $this->redirectToRoute('article_index', [], Response::HTTP_SEE_OTHER);
+        
+
+        // // return $this->renderForm('article/edit.html.twig', [
+        // //     'article' => $article,
+        // //     'form' => $form,
+        // // ]);
+        // return $this->json($article, 201, []);
+        $data = json_decode($request->getContent(), true);
         $form = $this->createForm(ArticleType::class, $article);
-        $form->handleRequest($request);
+        $form->submit($data);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($article);
+        $em->flush();
+        $response = new JsonResponse($data, 200);
+        return $response;
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('article_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->renderForm('article/edit.html.twig', [
-            'article' => $article,
-            'form' => $form,
-        ]);
     }
 
     /**
-     * @Route("/{id}", name="article_delete", methods={"POST"})
+     * @Route("/{id}", name="article_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Article $article): Response
+    public function delete(Request $request, Article $article, $id): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$article->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($article);
-            $entityManager->flush();
-        }
+        // if ($this->isCsrfTokenValid('delete'.$article->getId(), $request->request->get('_token'))) {
+        //     $entityManager = $this->getDoctrine()->getManager();
+        //     $entityManager->remove($article);
+        //     $entityManager->flush();
+        // }
 
-        return $this->redirectToRoute('article_index', [], Response::HTTP_SEE_OTHER);
+        // return $this->json($article, 201, []);
+        $article = $this->getDoctrine()->getRepository(Article::class)->find($id);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($article);
+        $entityManager->flush();
+        return $this->json($article, 201, []);
+
+
     }
 }

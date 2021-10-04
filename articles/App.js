@@ -6,6 +6,7 @@ import Articles from "./src/home";
 import Create from "./src/create";
 import Btn from "./src/buttons";
 import Detail from "./src/details";
+import Editt from "./src/edit";
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,7 @@ export default function App() {
         <Stack.Screen name="Article" component={Articles} />
         <Stack.Screen name="Create" component={Create} />
         <Stack.Screen name="Details" component={Detail} />
+        <Stack.Screen name="Edit" component={Editt} />
       </Stack.Navigator>
     </NavigationContainer>
   );

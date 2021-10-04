@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect, useParams } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 import {
@@ -13,12 +13,30 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-const Create = () => {
+const Editt = ({ route }) => {
   const navigation = useNavigation();
 
   const [title, onChangeTitle] = React.useState("");
   const [desc, onChangeDesc] = React.useState(null);
+  const [edit, setEdit] = React.useState([]);
+  const { id } = route.params;
 
+  useEffect(() => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    fetch("http://10.0.2.2:8000/article/" + id + "/", requestOptions)
+      .then((response) => response.json())
+      .then((result) => setEdit(result))
+      .catch((error) => console.log("error :", error));
+  }, []);
+  console.log("la c'est l'edit => ", edit);
   function Verify() {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -35,13 +53,13 @@ const Create = () => {
       redirect: "follow",
     };
 
-    fetch("http://10.0.2.2:8000/article/new", requestOptions)
+    fetch("http://10.0.2.2:8000/article/" + id + "/edit", requestOptions)
       .then((response) => response.json())
       .then((result) => console.log(result))
       .catch((error) => console.log("error :", error));
     Alert.alert(
       "Succes",
-      "Merci, Votre article a été crées",
+      "Vous avez modifié votre article",
       [
         {
           text: "Retour",
@@ -52,7 +70,7 @@ const Create = () => {
         cancelable: true,
       }
     );
-    navigation.navigate("Article");
+    navigation.navigate("Home");
   }
 
   return (
@@ -61,32 +79,24 @@ const Create = () => {
         <TextInput
           style={styles.input}
           onChangeText={onChangeTitle}
-          value={title}
-          placeholder="Titre"
+          value={edit.title}
+          placeholder="titre"
         />
         <TextInput
           style={styles.desc}
           onChangeText={onChangeDesc}
-          value={desc}
+          value={edit.content}
           placeholder="Description"
           multiline={true}
           numberOfLines={10}
         />
       </View>
-      <TouchableOpacity onPress={Verify} style={styles.appButtonContainer}>
-        <Text style={styles.appButtonText}> Ajouter votre article </Text>
-      </TouchableOpacity>
-
-      <Button
-        style={styles.btnn}
-        title="voir tous les articles"
-        onPress={() => navigation.navigate("Article")}
-      />
+      <Button title="Modifier" onPress={Verify}></Button>
     </SafeAreaView>
   );
 };
 
-export default Create;
+export default Editt;
 const styles = StyleSheet.create({
   inputs: {
     marginTop: 200,

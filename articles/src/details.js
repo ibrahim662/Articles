@@ -16,10 +16,15 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
+  del: {
+    marginBottom: 10,
+  },
 });
 
 const Articles = ({ route }) => {
   const [details, setDetails] = useState([]);
+  const [del, setDel] = useState([]);
+  const navigation = useNavigation();
 
   const { id } = route.params;
   console.log(id);
@@ -45,6 +50,27 @@ const Articles = ({ route }) => {
       <View style={styles.artc}>
         <Text>{details.title}</Text>
         <Text>{details.content}</Text>
+        <View style={styles.del}>
+          <Button
+            onPress={() => {
+              navigation.navigate("Edit", { id: details.id });
+            }}
+            title="Modifier cet article"
+          ></Button>
+        </View>
+        <Button
+          onPress={() => {
+            fetch("http://10.0.2.2:8000/article/" + details.id, {
+              method: "DELETE",
+            })
+              .then((response) => response.json())
+              .then((result) => setDel(result))
+              .catch((error) => console.error(error));
+            alert("vous avez supprimé l'article " + details.title);
+            navigation.navigate("Home");
+          }}
+          title="Supprimer cet article"
+        ></Button>
       </View>
     </View>
   );
